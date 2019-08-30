@@ -1,26 +1,39 @@
 import React from "react";
 import { Field, reduxForm } from "redux-form";
+import { connect } from "react-redux";
+import { createStream } from ".././actions";
 class StreamCreate extends React.Component {
-  renderInput(formProps) {
-    console.log(formProps.meta);
+  renderError({ error, touched }) {
+    if (touched && error) {
+      return (
+        <div>
+          <div className="header">{error}</div>
+        </div>
+      );
+    }
+  }
+
+  renderInput = formProps => {
+    // with out erroe its give undefuie
     return (
       <div>
         <label>{formProps.label} </label>
         <input {...formProps.input} autoComplete="off" />
+        {this.renderError(formProps.meta)}
       </div>
     );
-  }
+  };
 
-  onSumbit(event) {
-    console.log(event);
-  }
+  onSumbit = event => {
+    this.props.createStream(event);
+  };
 
   render() {
     console.log(this.props);
     return (
       <form
         onSubmit={this.props.handleSubmit(this.onSumbit)}
-        className="ui form"
+        className="ui form error"
       >
         <Field name="title" component={this.renderInput} label="Enter Title" />
         <Field
@@ -43,7 +56,12 @@ const validate = formValue => {
   }
   return error;
 };
-export default reduxForm({
+const formWraped = reduxForm({
   form: "StreamCreate",
   validate
 })(StreamCreate);
+
+export default connect(
+  null,
+  { createStream }
+)(formWraped);
